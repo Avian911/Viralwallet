@@ -5,12 +5,6 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
-    exclude: ['lucide-react', 'pg'],
-  },
-  resolve: {
-    alias: {
-      'cloudflare:sockets': '/src/empty-module.js',
-      'pg': '/src/empty-module.js'
-    }
+    exclude: ['lucide-react'],
   }
 });
