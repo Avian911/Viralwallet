@@ -21,18 +21,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const initializeApp = async () => {
       try {
         // Initialize database
-        await initializeDatabase();
+        const dbInitialized = await initializeDatabase();
+        console.log('Database initialization result:', dbInitialized);
         
         // Check for stored user
         const storedUser = localStorage.getItem('viralWalletUser');
         if (storedUser) {
-          const userData = JSON.parse(storedUser);
-          // Refresh user data from database
-          const freshUser = await getUserByEmail(userData.email);
-          if (freshUser) {
-            setUser(freshUser);
-            localStorage.setItem('viralWalletUser', JSON.stringify(freshUser));
-          } else {
+          try {
+            const userData = JSON.parse(storedUser);
+            // Refresh user data from database
+            const freshUser = await getUserByEmail(userData.email);
+            if (freshUser) {
+              setUser(freshUser);
+              localStorage.setItem('viralWalletUser', JSON.stringify(freshUser));
+            } else {
+              localStorage.removeItem('viralWalletUser');
+            }
+          } catch (parseError) {
+            console.error('Error parsing stored user data:', parseError);
             localStorage.removeItem('viralWalletUser');
           }
         }

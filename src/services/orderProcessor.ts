@@ -16,7 +16,9 @@ export const startOrderProcessor = () => {
   };
 
   // Process orders immediately on start
-  processOrders();
+  setTimeout(() => {
+    processOrders();
+  }, 1000);
   
   // Then check every minute
   setInterval(processOrders, 60000);

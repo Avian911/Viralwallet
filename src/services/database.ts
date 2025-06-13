@@ -1,14 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://ep-cool-salad-a8lba6u0-pooler.eastus2.azure.neon.tech';
-const supabaseKey = 'npg_5qIiHAbL6ZuN'; // This would normally be an anon key, but we'll use direct connection
-
-// For direct PostgreSQL connection, we'll use a different approach
-const DATABASE_URL = import.meta.env.VITE_DATABASE_URL || 'postgresql://neondb_owner:npg_5qIiHAbL6ZuN@ep-cool-salad-a8lba6u0-pooler.eastus2.azure.neon.tech/neondb?sslmode=require';
-
-// Since we can't use pg directly in browser, we'll simulate database operations
-// In a real production app, these would be API calls to your backend
-
+// Mock database for browser environment since we can't connect directly to Neon from frontend
 let mockDatabase: any = {
   users: [],
   services: [],
@@ -104,10 +96,11 @@ export const initializeDatabase = async () => {
       ];
     }
 
-    console.log('Database initialized successfully with Neon connection');
+    console.log('Database initialized successfully');
+    return true;
   } catch (error) {
     console.error('Database initialization error:', error);
-    throw error;
+    return false;
   }
 };
 
@@ -118,66 +111,88 @@ export const getDbClient = async () => {
       // Simulate database queries with mock data
       console.log('Executing query:', sql, params);
       
-      if (sql.includes('SELECT * FROM users WHERE email = $1')) {
-        const email = params[0];
-        const user = mockDatabase.users.find((u: any) => u.email === email);
-        return { rows: user ? [user] : [] };
-      }
-      
-      if (sql.includes('INSERT INTO users')) {
-        const newUser = {
-          id: mockDatabase.users.length + 1,
-          name: params[0],
-          email: params[1],
-          phone: params[2],
-          balance: params[3] || 0,
-          role: params[4] || 'customer',
-          status: params[5] || 'active',
-          created_at: new Date()
-        };
-        mockDatabase.users.push(newUser);
-        return { rows: [newUser] };
-      }
-      
-      if (sql.includes('SELECT * FROM services')) {
-        return { rows: mockDatabase.services };
-      }
-      
-      if (sql.includes('SELECT * FROM orders WHERE user_id = $1')) {
-        const userId = params[0];
-        const orders = mockDatabase.orders.filter((o: any) => o.user_id === userId);
-        return { rows: orders };
-      }
-      
-      if (sql.includes('INSERT INTO orders')) {
-        const newOrder = {
-          id: mockDatabase.orders.length + 1,
-          user_id: params[0],
-          service_id: params[1],
-          service_name: params[2],
-          platform: params[3],
-          quantity: params[4],
-          price: params[5],
-          link: params[6],
-          status: params[7] || 'processing',
-          created_at: new Date()
-        };
-        mockDatabase.orders.push(newOrder);
-        return { rows: [newOrder] };
-      }
-      
-      if (sql.includes('UPDATE users SET balance = $1 WHERE id = $2')) {
-        const balance = params[0];
-        const userId = params[1];
-        const user = mockDatabase.users.find((u: any) => u.id === userId);
-        if (user) {
-          user.balance = balance;
+      try {
+        if (sql.includes('SELECT * FROM users WHERE email = $1')) {
+          const email = params[0];
+          const user = mockDatabase.users.find((u: any) => u.email === email);
+          return { rows: user ? [user] : [] };
         }
+        
+        if (sql.includes('INSERT INTO users')) {
+          const newUser = {
+            id: mockDatabase.users.length + 1,
+            name: params[0],
+            email: params[1],
+            phone: params[2],
+            balance: params[3] || 0,
+            role: params[4] || 'customer',
+            status: params[5] || 'active',
+            created_at: new Date()
+          };
+          mockDatabase.users.push(newUser);
+          return { rows: [newUser] };
+        }
+        
+        if (sql.includes('SELECT * FROM services')) {
+          return { rows: mockDatabase.services };
+        }
+        
+        if (sql.includes('SELECT * FROM orders WHERE user_id = $1')) {
+          const userId = params[0];
+          const orders = mockDatabase.orders.filter((o: any) => o.user_id === userId);
+          return { rows: orders };
+        }
+        
+        if (sql.includes('SELECT * FROM orders') && sql.includes('ORDER BY created_at DESC')) {
+          return { rows: mockDatabase.orders };
+        }
+        
+        if (sql.includes('INSERT INTO orders')) {
+          const newOrder = {
+            id: mockDatabase.orders.length + 1,
+            user_id: params[0],
+            service_id: params[1],
+            service_name: params[2],
+            platform: params[3],
+            quantity: params[4],
+            price: params[5],
+            link: params[6],
+            status: params[7] || 'processing',
+            created_at: new Date()
+          };
+          mockDatabase.orders.push(newOrder);
+          return { rows: [newOrder] };
+        }
+        
+        if (sql.includes('UPDATE users SET balance = $1 WHERE id = $2')) {
+          const balance = params[0];
+          const userId = params[1];
+          const user = mockDatabase.users.find((u: any) => u.id === userId);
+          if (user) {
+            user.balance = balance;
+          }
+          return { rows: [] };
+        }
+        
+        if (sql.includes('UPDATE orders SET status = $1')) {
+          const status = params[0];
+          const orderId = params[1];
+          const order = mockDatabase.orders.find((o: any) => o.id === orderId);
+          if (order) {
+            order.status = status;
+            if (status === 'completed') {
+              order.completed_at = new Date();
+            }
+          }
+          return { rows: [] };
+        }
+        
+        // Default return for other queries
+        return { rows: [] };
+      } catch (error) {
+        console.error('Query error:', error);
         return { rows: [] };
       }
-      
-      // Default return for other queries
-      return { rows: [] };
     }
   };
 };

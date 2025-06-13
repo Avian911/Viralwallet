@@ -33,19 +33,23 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
     );
   }
   
-  return user ? <>{children}</> : <Navigate to="/login" />;
+  return user ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
 const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   
-  return user?.role === 'admin' ? <>{children}</> : <Navigate to="/dashboard" />;
+  return user?.role === 'admin' ? <>{children}</> : <Navigate to="/dashboard" replace />;
 };
 
 function App() {
   useEffect(() => {
     // Start the order processor for auto-completing orders
-    startOrderProcessor();
+    try {
+      startOrderProcessor();
+    } catch (error) {
+      console.error('Error starting order processor:', error);
+    }
   }, []);
 
   return (
