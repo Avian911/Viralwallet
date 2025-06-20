@@ -243,89 +243,67 @@ const WalletRequests: React.FC = () => {
         )}
       </div>
 
-      {/* Request Details Modal - Fixed positioning and scrolling */}
+      {/* Request Details Modal */}
       {showDetailsModal && selectedRequest && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-auto my-8 relative">
-            <div className="p-6 max-h-[calc(100vh-4rem)] overflow-y-auto">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-gray-900">Wallet Request Details</h3>
-                <button
-                  onClick={() => setShowDetailsModal(false)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  <XCircle className="h-6 w-6" />
-                </button>
-              </div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Wallet Request Details</h3>
               
-              <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Request ID</label>
-                    <div className="text-sm text-gray-900 bg-gray-50 p-2 rounded">#{selectedRequest.id}</div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                    <span className={`inline-flex px-3 py-1 text-sm rounded-full font-medium ${getStatusColor(selectedRequest.status)}`}>
-                      {selectedRequest.status.charAt(0).toUpperCase() + selectedRequest.status.slice(1)}
-                    </span>
-                  </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Request ID</label>
+                  <div className="text-sm text-gray-900">#{selectedRequest.id}</div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Customer</label>
-                  <div className="text-sm text-gray-900 bg-gray-50 p-3 rounded-lg">
-                    <div className="font-medium">{selectedRequest.userName}</div>
-                    <div className="text-gray-600 text-xs mt-1">
-                      {mockUsers.find(u => u.id === selectedRequest.userId)?.email}
-                    </div>
-                  </div>
+                  <div className="text-sm text-gray-900">{selectedRequest.userName}</div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
-                  <div className="text-2xl font-bold text-green-600 bg-green-50 p-3 rounded-lg text-center">
-                    ₦{selectedRequest.amount.toLocaleString()}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Request Date</label>
-                    <div className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
-                      {formatDate(selectedRequest.createdAt)}
-                    </div>
-                  </div>
-                  {selectedRequest.processedAt && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Processed Date</label>
-                      <div className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
-                        {formatDate(selectedRequest.processedAt)}
-                      </div>
-                    </div>
-                  )}
+                  <div className="text-lg font-bold text-gray-900">₦{selectedRequest.amount.toLocaleString()}</div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Payment Proof</label>
-                  <div className="border border-gray-200 rounded-lg p-3 bg-gray-50">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <span className={`inline-flex px-2 py-1 text-xs rounded-full font-medium ${getStatusColor(selectedRequest.status)}`}>
+                    {selectedRequest.status.charAt(0).toUpperCase() + selectedRequest.status.slice(1)}
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Request Date</label>
+                  <div className="text-sm text-gray-900">{formatDate(selectedRequest.createdAt)}</div>
+                </div>
+
+                {selectedRequest.processedAt && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Processed Date</label>
+                    <div className="text-sm text-gray-900">{formatDate(selectedRequest.processedAt)}</div>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Payment Proof</label>
+                  <div className="border border-gray-200 rounded-lg p-3">
                     <img
                       src={selectedRequest.proofImage}
                       alt="Payment proof"
-                      className="w-full h-48 object-cover rounded-lg shadow-sm"
+                      className="w-full h-40 object-cover rounded"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = 'https://images.pexels.com/photos/164527/pexels-photo-164527.jpeg';
                       }}
                     />
-                    <p className="text-xs text-gray-500 mt-2 text-center">Payment receipt/screenshot</p>
                   </div>
                 </div>
               </div>
 
-              <div className="flex gap-3 mt-8 pt-6 border-t border-gray-200">
+              <div className="flex gap-3 mt-6">
                 <button
                   onClick={() => setShowDetailsModal(false)}
-                  className="flex-1 bg-gray-100 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-200 transition-all font-medium"
+                  className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition-all"
                 >
                   Close
                 </button>
@@ -336,7 +314,7 @@ const WalletRequests: React.FC = () => {
                         handleDecline(selectedRequest.id);
                         setShowDetailsModal(false);
                       }}
-                      className="flex-1 bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-all font-medium"
+                      className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-all"
                     >
                       Decline
                     </button>
@@ -345,7 +323,7 @@ const WalletRequests: React.FC = () => {
                         handleApprove(selectedRequest.id, selectedRequest.amount, selectedRequest.userId);
                         setShowDetailsModal(false);
                       }}
-                      className="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-all font-medium"
+                      className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-all"
                     >
                       Approve
                     </button>
